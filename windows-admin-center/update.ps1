@@ -16,7 +16,7 @@ function global:au_GetLatest {
 
     $Latest = @{}
 
-    try {
+    #try {
         # Get latest version from XML
         $response = Invoke-WebRequest -Method Head -Uri "https://aka.ms/WACDownload" -MaximumRedirection 0 -ErrorAction Ignore
 
@@ -45,10 +45,10 @@ function global:au_GetLatest {
             Url32 = $url
             Checksum32 = $checksum
         }
-    }
-    catch {
-        Write-Error $_
-    }
+    # }
+    # catch {
+    #     Write-Error $_
+    # }
     return $Latest
 }
 
