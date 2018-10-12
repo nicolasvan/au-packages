@@ -24,6 +24,8 @@ function global:au_GetLatest {
 
     $response = Invoke-RestMethod -Uri "https://upgrades.counterpath.com/xlite4/upgrade.php?build=76589"
 
+    Write-Warning $response 
+    
     $iniFile = [IO.Path]::GetTempFileName()
 
     Set-Content -Path $iniFile -Value $response
