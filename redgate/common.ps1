@@ -23,6 +23,15 @@ function global:au_GetLatest {
         $lastModifiedHeader = $response.Headers.'Last-Modified'
         $lastModified = [DateTimeOffset]::Parse($lastModifiedHeader, [Globalization.CultureInfo]::InvariantCulture)
 
+        if([datetimeoffset](get-date) -lt $lastModified.AddDays(-1)){
+            # Make sure the release is at least 1 day old before we make a package for it.
+            # That's because Redgate can sometimes release toolbelts multiple times per day.
+            # Because installers are released in a yyyy-MM-dd subfolder, previous installers
+            # released in the same day are overriden which will cause
+            # checksums to mismatch if we generate the chocolatey package too quickly.
+            return 'ignore'
+        }
+
         # Redgate's installers are uploaded to https://download.red-gate.com/installers/<name>/<date-released>/<name>.exe
         # and the main https://download.red-gate.com/<name>.exe is just a redirect.
         # so use the url with the date to keep the chocolatey package stable and do away with checksum errors.
@@ -33,7 +42,7 @@ function global:au_GetLatest {
 
         Write-Verbose "Downloading $downloadUrl"
         try {
-            
+
             $client = new-object System.Net.WebClient
             $client.DownloadFile($downloadUrl, $downloadedFile)
 
@@ -52,7 +61,7 @@ function global:au_GetLatest {
 
             Remove-Item $downloadedFile
 
-            $Latest = @{ 
+            $Latest = @{
                 URL32 = $downloadUrl
                 Version = $version
                 Checksum32 = $checksum
@@ -68,7 +77,7 @@ function global:au_GetLatest {
 
         $Latest = 'ignore'
     }
-     
+
     return $Latest
 }
 
